@@ -1,0 +1,146 @@
+---
+title: "Recreating the 2010 Rwanda DHS using GridSample"
+author: "Nick W Ruktanonchai, Dana R Thomson, also Egor Kotov (added the final map)"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+      toc_depth: 3
+---
+
+
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(fig.width=7, fig.height=5,
+                      warning = FALSE, message = FALSE)
+```
+
+
+
+
+*You can find the original vignette [here](https://github.com/cran/gridsample/blob/master/vignettes/Rwanda.Rmd){target="_blank"}. The code in this adjusted vignette is intended to work with the [latest functioning version of the GridSample package ](https://github.com/e-kotov/gridsample){target="_blank"}. This code should be executed using R version [4.0.1 from a Rocker Geospatial container image](https://hub.docker.com/layers/rocker/geospatial/4.0.1/images/sha256-8282e2f8dfa487a29ce8a78cf5beca1548cc0a0b5142f2f3559d5e3a461dee16){target="_blank"}.*
+
+The fixed version of the `gridsample` package is already installed if you are running this code from a Binder deployed container, but if you are running this code on your local machine or a Docker container, you may have to install the package manually with the line below:
+
+```{r eval=FALSE}
+remotes::install_github("e-kotov/gridsample", force = T)
+```
+
+Here we use the GridSample package [https://doi.org/10.1186/s12942-017-0098-4](https://doi.org/10.1186/s12942-017-0098-4){target="_blank"} to replicate the sample design of the 2010 Rwanda DHS. Further details are available at: [https://www.dhsprogram.com/pubs/pdf/FR259/FR259.pdf](https://www.dhsprogram.com/pubs/pdf/FR259/FR259.pdf){target="_blank"}.
+
+## Parameters
+
+The 2010 Rwanda DHS sampled 12,540 households from 492 PSUs comprising rural villages and urban neighborhoods (30). The sample was stratified by Rwanda's 30 districts, urban areas were oversampled by adding 12 PSUs in Kigali's three districts, and 26 households were sampled from each urban and rural PSU. The average village in Rwanda had 610 occupants according to the sample frame.
+
+Therefore, the corresponding parameters for the `gs_sample` algorithm are
+
+```{r}
+cfg_hh_per_stratum <- 416 #
+cfg_hh_per_urban <- 26 # households from each urban PSU
+cfg_hh_per_rural <- 26 # households from each rural PSU
+cfg_pop_per_psu <- 610 # limit PSU size to the average village size
+```
+
+## Data preparation
+
+We start with two files, a population raster and a shapefile `RWAshp` defining the various strata in the census. Here, the strata shapefile  consists of the 30 districts. The population raster can be downloaded from <www.worldpop.org.uk>. For the purposes of this example, we will use the population raster that estimates population in Rwanda for 2010, adjusted using census estimates, where each grid-cell represents the population per pixel. The corresponding raster when downloaded from the WorldPop website is named `RWA_ppp_v2b_2010_UNadj.tif`.
+
+First, we read in the relevant datasets, and rasterize the strata layer using a field that contains a unique identifier for each polygon.
+
+```{r}
+library(gridsample)
+library(raster)
+population_raster <- raster(system.file("extdata", "RWA_ppp_2010_adj_v2.tif",
+  package="gridsample"))
+plot(population_raster)
+data(RWAshp)
+strata_raster <- rasterize(RWAshp,population_raster,field = "STL.2")
+plot(strata_raster)
+```
+
+We need a raster that defines urban and rural areas as well. Here, we'll define urban areas by determining the population cell density associated with the official proportion of people in an urban area. The 2012 Rwanda census found 16% of people to live in urban areas, so we'll change the most dense cells as urban, until 16% of the population is defined as being in urban areas.
+
+
+```{r}
+total_pop <- cellStats(population_raster, stat = "sum")
+urban_pop_value <- total_pop * .16
+pop_df <- data.frame(index = 1:length(population_raster[]),
+  pop = population_raster[])
+pop_df <- pop_df[!is.na(pop_df$pop), ]
+pop_df <- pop_df[order(pop_df$pop,decreasing = T), ]
+pop_df$cumulative_pop <- cumsum(pop_df$pop)
+pop_df$urban <- 0
+pop_df$urban[which(pop_df$cumulative_pop <= urban_pop_value)] <- 1
+urban_raster <- population_raster >= min(subset(pop_df,urban == 1)$pop)
+plot(urban_raster)
+```
+
+## Using `gs_sample`
+
+Now that we have the population, strata, and urbanization rasters, we are ready to use the gridsample algorithm. We exclude any grid cells with a population less than 0.01 to prevent the algorithm from creating overly large sampling areas (`cfg_min_pop_per_cell = 0.01`), also restricting the total PSU size to less than 10km^2 (`cfg_max_psu_size = 10`). Finally, because we wanted the sample to be representative of both urban and rural areas, we allowed the algorithm to oversample rural or urban areas by setting `cfg_sample_rururb = TRUE`. We save the output shapefile to a temporary directory.
+
+```{r gs_sample, results='hide'}
+set.seed(32131)
+psu_polygons <- gs_sample(
+  population_raster = population_raster,
+  strata_raster = strata_raster,
+  urban_raster = urban_raster,
+  cfg_desired_cell_size = NA,
+  cfg_hh_per_stratum = 416,
+  cfg_hh_per_urban = 26,
+  cfg_hh_per_rural = 26,
+  cfg_min_pop_per_cell = 0.01,
+  cfg_max_psu_size = 10,
+  cfg_pop_per_psu = 610,
+  cfg_sample_rururb = TRUE,
+  cfg_sample_spatial = FALSE,
+  cfg_sample_spatial_scale = 100,
+  output_path = tempdir(),
+  sample_name = "rwanda_psu"
+)
+```
+
+
+
+
+## Create the final plot
+
+```{r}
+# load ggplot2 and scales
+library(ggplot2)
+library(scales)
+
+# convert spatial data to be compatible with ggplot and remove NAs
+population_raster_df <- as.data.frame(population_raster, xy = TRUE)
+population_raster_df <- population_raster_df[!is.na(population_raster_df$RWA_ppp_2010_adj_v2),]
+psu_polygons_sf <- sf::st_as_sf(psu_polygons)
+
+# Prepare breaks and labels for the original population values
+breaks <- c(1, 10, 100, 1000, 10000, 50000)
+labels <- as.character(breaks)
+
+# create the plot
+psu_plot <- ggplot() +
+  geom_raster(data = population_raster_df, aes(x = x, y = y, fill = RWA_ppp_2010_adj_v2)) +
+  scale_fill_viridis_c(trans = 'log10', breaks = breaks, labels = labels) +
+  labs(fill = "Population") + # Adjust the label
+  geom_sf(data = psu_polygons_sf, aes(color = ""), fill = NA, size = 0.3) +
+  scale_color_manual(values = "grey20", name = "", labels = "Primary Sampling\nUnits") +
+  labs(title = "Household survey primary sampling units (PSUs)\nfrom gridded population data in Rwanda",
+       subtitle = "Sample of locations\nrepresentative of both urban and rural areas",
+       caption = "using GridSample method and\ncorresponding R package (Thomson et al., 2017)",
+       x = "", y = "") +
+  theme_minimal(base_size = 8)
+
+# print the final plot
+print(psu_plot)
+```
+
+Save the final plot for the publication:
+
+```{r}
+ggsave("psu_polygons.png", psu_plot, units = "cm", dpi = 200, width = 12, height = 10)
+```
+
