@@ -1,4 +1,4 @@
-# Expanding Lifespan of Software for Demographic Analysis with Containers: A Case for a Sampling Technique
+# Expanding the Lifespan of Software for Demographic Analysis with Containers: An Application to a Sampling Technique
 
 ## Run this repository in a web browser using Binder. Push the button >> [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/e-kotov/grid-sample-containerized/HEAD?urlpath=rstudio)
 
