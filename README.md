@@ -2,7 +2,7 @@
 
 ## Run this repository in a web browser using Binder. Push the button >> [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/e-kotov/grid-sample-containerized/HEAD?urlpath=rstudio)
 
-First launch may take up to 5 minutes.
+First launch may take up to 5 minutes. If it is taking more than that, please retry.
 
 This repository contains files for the article about using containers for reproducible research with applications in demography.
 
