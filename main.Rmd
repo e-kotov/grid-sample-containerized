@@ -20,12 +20,12 @@ knitr::opts_chunk$set(fig.width=7, fig.height=5,
 
 
 
-*You can find the original vignette [here](https://github.com/cran/gridsample/blob/master/vignettes/Rwanda.Rmd){target="_blank"}. The code in this adjusted vignette is intended to work with the [latest functioning version of the GridSample package ](https://github.com/e-kotov/gridsample){target="_blank"}. This code should be executed using R version [4.0.1 from a Rocker Geospatial container image](https://hub.docker.com/layers/rocker/geospatial/4.0.1/images/sha256-8282e2f8dfa487a29ce8a78cf5beca1548cc0a0b5142f2f3559d5e3a461dee16){target="_blank"}.*
+*You can find the original vignette [here](https://github.com/cran/gridsample/blob/master/vignettes/Rwanda.Rmd){target="_blank"}. The code in this adjusted vignette is intended to work with the [latest functioning version of the GridSample package](https://github.com/nrukt00vt/gridsample){target="_blank"}. This code should be executed using R version 4.0.1 from a [Rocker Geospatial](https://hub.docker.com/layers/rocker/geospatial/4.0.1/images/sha256-8282e2f8dfa487a29ce8a78cf5beca1548cc0a0b5142f2f3559d5e3a461dee16){target="_blank"} or [Rocker Binder](https://hub.docker.com/layers/rocker/binder/4.0.1/images/sha256-5278a47893f9f818c04e78c9cb185b4209af0fe392ecc281bc15ea5059f7f9fb){target="_blank"}.*
 
 The fixed version of the `gridsample` package is already installed if you are running this code from a Binder deployed container, but if you are running this code on your local machine or a Docker container, you may have to install the package manually with the line below:
 
 ```{r eval=FALSE}
-remotes::install_github("e-kotov/gridsample", force = T)
+remotes::install_github("nrukt00vt/gridsample@03c2d10134cbf94dc8c7452c3a5967c8624e260a", force = TRUE, dependencies = TRUE)
 ```
 
 Here we use the GridSample package [https://doi.org/10.1186/s12942-017-0098-4](https://doi.org/10.1186/s12942-017-0098-4){target="_blank"} to replicate the sample design of the 2010 Rwanda DHS. Further details are available at: [https://www.dhsprogram.com/pubs/pdf/FR259/FR259.pdf](https://www.dhsprogram.com/pubs/pdf/FR259/FR259.pdf){target="_blank"}.
