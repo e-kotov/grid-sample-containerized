@@ -4,7 +4,13 @@
 
 First launch may take up to 5 minutes. If it is taking more than that, please retry.
 
-This repository contains files for the article about using containers for reproducible research with applications in demography.
+This repository contains files for the article about using containers for reproducible research with applications in demography:
+
+- Kotov, E., and Denecke, E. (2024). Expanding the Lifespan of Software for Demographic Analysis with Containers: An Application of Spatial Sampling. The Denominator, Population Dynamics Lab. [https://doi.org/10.6069/WY8K-D973](https://doi.org/10.6069/WY8K-D973)
+
+- Kotov, E., and Denecke, E. (2024). Increasing the Lifespan of Software for Demographic Analysis. The Download, Population Dynamics Lab. [https://doi.org/10.6069/7JXS-6C18](https://doi.org/10.6069/7JXS-6C18)
+
+- Kotov, E., and Denecke, E. (2024). Code Repository: Expanding the Lifespan of Software for Demographic Analysis with Containers. Population Dynamics Lab. [https://doi.org/10.6069/s8bf-rt57](https://doi.org/10.6069/s8bf-rt57)
 
 ## Files description
 
