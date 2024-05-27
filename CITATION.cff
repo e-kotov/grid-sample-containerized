@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Code Repository: Expanding the Lifespan of Software for Demographic Analysis with Containers"
+authors:
+  - family-names: "Kotov"
+    given-names: "Egor"
+    orcid: "https://orcid.org/0000-0001-6690-5345"
+  - family-names: "Denecke"
+    given-names: "Esther"
+    orcid: "https://orcid.org/0009-0006-0336-6528"
+date-released: 2024
+doi: "10.5281/zenodo.11174831"
+version: "1.0.0"
+url: "https://github.com/e-kotov/grid-sample-containerized"
