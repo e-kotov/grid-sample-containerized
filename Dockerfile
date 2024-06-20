@@ -8,7 +8,7 @@
 # For details about rocker container images, see: https://rocker-project.org/images/
 # For details on the specific container file code for rocker/binder:4.0.1, see:
 # https://github.com/rocker-org/rocker-versioned2/blob/master/dockerfiles/binder_4.0.1.Dockerfile
-FROM rocker/binder:4.0.1
+FROM rocker/binder:4.0.2
 
 
 # Next command copies all files from the repository to the home directory
