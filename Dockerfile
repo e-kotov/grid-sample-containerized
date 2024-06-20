@@ -1,14 +1,4 @@
-# In this file, we are describing a container that will run the code from the repository.
-
-# The following command instructs Binder to use the rocker/binder container image
-# with version 4.0.1 as a foundation for our container.
-# This container image comes with RStudio and R, as well as geospatial libraries,
-# as it is based on the rocker/geospatial container image.
-# In addition, it has extra preinstalled software that allows it to be launched using Binder.
-# For details about rocker container images, see: https://rocker-project.org/images/
-# For details on the specific container file code for rocker/binder:4.0.1, see:
-# https://github.com/rocker-org/rocker-versioned2/blob/master/dockerfiles/binder_4.0.1.Dockerfile
-FROM rocker/binder:4.0.2
+FROM rocker/binder:4.4.0
 
 
 # Next command copies all files from the repository to the home directory
