@@ -1,4 +1,4 @@
-FROM rocker/binder:4.4.0
+FROM rocker/binder:4.0
 
 
 # Next command copies all files from the repository to the home directory
